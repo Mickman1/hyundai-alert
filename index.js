@@ -25,43 +25,42 @@ client.on('ready', async () => {
 	interiorColorMap.set('NNB', 'Black')
 
 	setInterval(function() {
-		fetch(url, settings)
-			.then(res => res.json())
-				.then((json) => {
-					// Loop through all dealerships in radius
-					for (let d = 0; d < json.data[0].dealerInfo.length; d++) {
+		fetch(url, settings).then(res => res.json()).then((json) => {
+			// Loop through all dealerships in radius
+			for (let d = 0; d < json.data[0].dealerInfo.length; d++) {
+				// If dealer has no vehicles listed, skip
+				if (json.data[0].dealerInfo[d].vehicles === null) {
+					continue
+				}
 
-						if (json.data[0].dealerInfo[d].vehicles !== null) {
-							// Loop through all available vehicles at dealership
-							for (let i = 0; i < json.data[0].dealerInfo[d].vehicles.length; i++) {
+				// Loop through all available vehicles at dealership
+				for (let i = 0; i < json.data[0].dealerInfo[d].vehicles.length; i++) {
+					var data = json.data[0].dealerInfo[d].vehicles[i]
 
-								var data = json.data[0].dealerInfo[d].vehicles[i]
-
-								if (data.trimDesc !== 'SE') {
-									continue
-								}
-
-								if (data.drivetrainDesc !== 'REAR WHEEL DRIVE') {
-									continue
-								}
-
-								if (data.exteriorColorCd === 'MZH') {
-									continue
-								}
-
-								if (data.PlannedDeliveryDate !== null) {
-									user.send(`**ALERT!** \`${exteriorColorMap.get(data.exteriorColorCd)}\` with \`${interiorColorMap.get(data.interiorColorCd)}\` interior arriving on \`${data.PlannedDeliveryDate.substring(5, 10).replaceAll('-', '/') + '/' + data.PlannedDeliveryDate.substring(0, 4)}\``)
-									console.log(`ALERT! ${exteriorColorMap.get(data.exteriorColorCd)} with ${interiorColorMap.get(data.interiorColorCd)} interior arriving on ${data.PlannedDeliveryDate.substring(5, 10).replaceAll('-', '/') + '/' + data.PlannedDeliveryDate.substring(0, 4)}`)
-								}
-
-								else {
-									console.log(`ALERT! ${exteriorColorMap.get(data.exteriorColorCd)} with ${interiorColorMap.get(data.interiorColorCd)} interior with no planned delivery`)
-									user.send(`**ALERT!** \`${exteriorColorMap.get(data.exteriorColorCd)}\` with \`${interiorColorMap.get(data.interiorColorCd)}\` interior with no planned delivery`)
-								}
-							}
-						}
+					if (data.trimDesc !== 'SE') {
+						continue
 					}
-				})
+
+					if (data.drivetrainDesc !== 'REAR WHEEL DRIVE') {
+						continue
+					}
+
+					if (data.exteriorColorCd === 'MZH') {
+						continue
+					}
+
+					if (data.PlannedDeliveryDate !== null) {
+						user.send(`**ALERT!** \`${exteriorColorMap.get(data.exteriorColorCd)}\` with \`${interiorColorMap.get(data.interiorColorCd)}\` interior arriving on \`${data.PlannedDeliveryDate.substring(5, 10).replaceAll('-', '/') + '/' + data.PlannedDeliveryDate.substring(0, 4)}\``)
+						console.log(`ALERT! ${exteriorColorMap.get(data.exteriorColorCd)} with ${interiorColorMap.get(data.interiorColorCd)} interior arriving on ${data.PlannedDeliveryDate.substring(5, 10).replaceAll('-', '/') + '/' + data.PlannedDeliveryDate.substring(0, 4)}`)
+					}
+
+					else {
+						console.log(`ALERT! ${exteriorColorMap.get(data.exteriorColorCd)} with ${interiorColorMap.get(data.interiorColorCd)} interior with no planned delivery`)
+						user.send(`**ALERT!** \`${exteriorColorMap.get(data.exteriorColorCd)}\` with \`${interiorColorMap.get(data.interiorColorCd)}\` interior with no planned delivery`)
+					}
+				}
+			}
+		})
 	}, 600000)
 })
 
